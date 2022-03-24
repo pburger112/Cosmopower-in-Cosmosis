@@ -6,8 +6,9 @@ Since the COSMOPOWER is only used to predict the power spectra we additional nee
 In order to to be able to use these modules you need to install:
 pip install cosmopower
 
-For a detailed description of COSMOPOWER see https://arxiv.org/pdf/2106.03846.pdf.
-The pretrained modules that are in trained_models are the one developed here https://arxiv.org/pdf/2106.03846.pdf and can be also found here https://github.com/alessiospuriomancini/cosmopower.
+For a detailed description of COSMOPOWER see https://arxiv.org/pdf/2106.03846.pdf, where the pretrained models can also be found here https://github.com/alessiospuriomancini/cosmopower. 
+
+
 
 
 
