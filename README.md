@@ -12,13 +12,13 @@ In order to run cosmopower inside cosmosis we modified the KIDS-1000 cosebins pi
 
 If you want to train the emulator again using the power spectra gnereated from cosmosis we added in the folder train_model 4 python modules.
 
-1_create_params:  creating the train and test paramters, for which the power spectra will be calculated. If you change them you also need to modify                           2_create_spectra. 
+1_create_params:  creating the train and test paramters, for which the power spectra will be calculated. If you change them you also need to modify 2_create_spectra. 
 
-2_create_spectra: calacualtes the power spectra using the cosmosis modules found in cosmosis_modules_4_training, where you need to modify powerspectra.ini                   if you wanna use different power spectra estimators. Don't forget to change the module name also in 2_create_spectra.py
+2_create_spectra: calacualtes the power spectra using the cosmosis modules found in cosmosis_modules_4_training, where you need to modify powerspectra.ini if you wanna use different power spectra estimators. Don't forget to change the module name also in 2_create_spectra.py
 
 3_train_emulator: As the name says it trains the emulator.
 
-4_test_emulator: It tests the emulator and creates two plots found in plots, where one is showing the accuary of the linear emulator and the other the                      accuracy of the boost factor.
+4_test_emulator: It tests the emulator and creates two plots found in plots, where one is showing the accuary of the linear emulator and the other the accuracy of the boost factor.
 
 
 
