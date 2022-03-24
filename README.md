@@ -8,6 +8,7 @@ pip install cosmopower
 
 For a detailed description of COSMOPOWER see https://arxiv.org/pdf/2106.03846.pdf, where the pretrained models can also be found here https://github.com/alessiospuriomancini/cosmopower. 
 
+In order to run cosmopower inside cosmosis we modified the KIDS-1000 cosebins pipeline.ini file, which is also provided here.
 
 
 
