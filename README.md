@@ -12,7 +12,7 @@ In order to run cosmopower inside cosmosis we modified the KIDS-1000 cosebins pi
 
 If you want to train the emulator again using the power spectra gnereated from cosmosis we added in the folder train_model 4 python modules.
 
-1_create_params:  creating the train and test sample, for which the power spectra will be calculated
+1_create_params:  creating the train and test paramters, for which the power spectra will be calculated. If you change them you also need to modify                           2_create_spectra. 
 
 2_create_spectra: calacualtes the power spectra using the cosmosis modules found in cosmosis_modules_4_training, where you need to modify powerspectra.ini                   if you wanna use different power spectra estimators. Don't forget to change the module name also in 2_create_spectra.py
 
