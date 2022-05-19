@@ -10,7 +10,7 @@ For a detailed description of COSMOPOWER see https://arxiv.org/pdf/2106.03846.pd
 
 In order to run cosmopower inside cosmosis we modified the KIDS-1000 cosebins pipeline.ini file, which is also provided here.
 
-If you want to train the emulator again using the power spectra gnereated from cosmosis we added in the folder train_model 4 python modules.
+If you want to train the emulator again using the power spectra genreated from cosmosis we added in the folder train_model 4 python modules.
 
 1_create_params:  creating the train and test paramters, for which the power spectra will be calculated. If you change them you also need to modify 2_create_spectra. 
 
