@@ -44,6 +44,9 @@ def setup(options):
         'kmax': options.get_double(option_section, 'kmax', default=10.0),
         'kmin': options.get_double(option_section, 'kmin', default=1e-5),
         'nk': options.get_int(option_section, 'nk', default=200),
+        'zmax': options.get_double(option_section, 'zmax', default=3.0),
+        'zmin': options.get_double(option_section, 'zmin', default=0.0),
+        'nz': options.get_int(option_section, 'nz', default=300),
         'use_specific_k_modes': options.get_bool(option_section, 'use_specific_k_modes', default=False),
     }
 
@@ -98,8 +101,8 @@ def execute(block, config):
 
     h0 = block[cosmo, 'h0']
     
-    z = block['NZ_SOURCE', 'z']
-    nz = block['NZ_SOURCE', 'nz']
+    nz = config['nz']
+    z = np.linspace(config['zmin'], config['zmax'], nz)
 
     block[distances, 'z'] = z
     block[distances, 'nz'] = nz
