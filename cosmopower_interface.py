@@ -48,7 +48,7 @@ def setup(options):
         'zmin': options.get_double(option_section, 'zmin', default=0.0),
         'nz': options.get_int(option_section, 'nz', default=300),
         'use_specific_k_modes': options.get_bool(option_section, 'use_specific_k_modes', default=False),
-        'feedback_model': options.get_bool(option_section, 'feedback_model', default='mead2016'),
+        'feedback_model': options.get_string(option_section, 'feedback_model', default='mead2016'),
     }
 
     assert config['feedback_model'] in ['mead2016', 'mead2020'], "Choose feedback_model from mead2016, mead2020"
@@ -70,13 +70,24 @@ def setup(options):
     return config
 
 
-def get_cosmopower_inputs(block, z, nz):
+def get_cosmopower_inputs(block, z, nz, model):
 
     # Get parameters from block and give them the
     # names and form that class expects
 
+    if block.has_value(cosmo, 'A_s'):
+        A_s = block[cosmo, 'A_s']
+        ln_a_s_e10 = np.log(A_s*1e10)
+        block[cosmo, 'ln_a_s_e10'] = ln_a_s_e10
+    elif block.has_value(cosmo, 'ln_a_s_e10'):
+        ln_a_s_e10 = block[cosmo, 'ln_a_s_e10']
+        A_s = np.exp(ln_a_s_e10) * 1e-10
+        block[cosmo, 'A_s'] = A_s
+    else:
+        raise ValueError("Can't find A_s or ln(10^10 * A_s) in datablock?")
+
     params_lin = {
-        'ln10^{10}A_s':  [np.log(block[cosmo, 'A_s']*10**10)]*nz,
+        'ln10^{10}A_s':[ln_a_s_e10]*nz,
         'n_s':       [block[cosmo, 'n_s']]*nz,
         'h':         [block[cosmo, 'h0']]*nz,
         'omega_b':   [block[cosmo, 'ombh2']]*nz,
@@ -84,18 +95,18 @@ def get_cosmopower_inputs(block, z, nz):
         'z':         z
     }
 
-    if config['feedback_model'] == 'mead2016':
+    if model == 'mead2016':
         if block.has_value(names.halo_model_parameters, 'eta0') or \
-           block.has_value(names.halo_model_parameters, 'eta') or
+           block.has_value(names.halo_model_parameters, 'eta') or \
            block.has_value(names.halo_model_parameters, 'eta_bary'):
-            key = [k for s, k in block.sections() if s == names.halo_model_parameters and k.startswith('eta')]
+            key = [k for s, k in block.keys() if s == names.halo_model_parameters and k.startswith('eta')]
             assert len(key) == 1, f"More than 1 value for eta_baryon in datablock? {key}"
             eta_bary = block[names.halo_model_parameters, key[0]]
         else:
             eta_bary = None
         if block.has_value(names.halo_model_parameters, 'A') or \
            block.has_value(names.halo_model_parameters, 'A_bary'):
-            key = [k for s, k in block.sections() if s == names.halo_model_parameters and k.startswith('A') or k.startswith('a')]
+            key = [k for s, k in block.keys() if s == names.halo_model_parameters and (k.startswith('A') or k.startswith('a'))]
             assert len(key) == 1, f"More than 1 value for A_baryon in datablock? {key}"
             A_bary = block[names.halo_model_parameters, key[0]]
             if eta_bary is None:
@@ -103,17 +114,17 @@ def get_cosmopower_inputs(block, z, nz):
         else:
             A_bary = 2.32 # set A to Pierre's default from testing
             eta_bary = 0.76 # set eta to Pierre's default from testing
-            print(f"Halo model {config['feedback_model']} parameters not given; setting A_bary={A_bary}, eta_bary={eta_bary}")
+            print(f"Halo model {model} parameters not given; setting A_bary={A_bary}, eta_bary={eta_bary}")
 
-    elif config['feedback_model'] == 'mead2020':
+    elif model == 'mead2020':
         if block.has_value(names.halo_model_parameters, 'logT_AGN'):
             logT_AGN = block[names.halo_model_parameters, 'logt_agn']
         else:
             logT_AGN = 7.8
-            print(f"Halo model {config['feedback_model']} parameter not given; setting logT_AGN={logT_AGN}")
+            print(f"Halo model {model} parameter not given; setting logT_AGN={logT_AGN}")
 
     params_boost = {
-        'ln10^{10}A_s':  [np.log(block[cosmo, 'A_s']*10**10)]*nz,
+        'ln10^{10}A_s':  [ln_a_s_e10]*nz,
         'n_s':           [block[cosmo, 'n_s']]*nz,
         'h':             [block[cosmo, 'h0']]*nz,
         'omega_b':       [block[cosmo, 'ombh2']]*nz,
@@ -123,10 +134,10 @@ def get_cosmopower_inputs(block, z, nz):
 #        'eta_0':         [eta]*nz
     }
 
-    if config['feedmack_model'] == 'mead2016':
+    if model == 'mead2016':
         params_boost['c_min'] = [A_bary]*nz
         params_boost['eta_0'] = [eta_bary]*nz
-    elif config['feedmack_model'] == 'mead2020':
+    elif model == 'mead2020':
         params_boost['logt_agn'] = [logT_AGN]*nz
 
     return params_lin, params_boost
@@ -146,7 +157,7 @@ def execute(block, config):
     k = config['lin_matter_power_cp'].modes
     nk = len(k)
 
-    params_lin,params_boost = get_cosmopower_inputs(block, z, nz)
+    params_lin,params_boost = get_cosmopower_inputs(block, z, nz, config['feedback_model'])
     P_lin = config['lin_matter_power_cp'].ten_to_predictions_np(params_lin).T
     P_nl = P_lin*config['nl_matter_power_boost_cp'].ten_to_predictions_np(params_boost).T
 
